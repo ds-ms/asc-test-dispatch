@@ -25,3 +25,4 @@ jobs:
           cluster-name: ds-ms-k8s
           code: Unhealthy
           severity: High
+          commid-id: ${{ github.event.client_payload.commit }}
