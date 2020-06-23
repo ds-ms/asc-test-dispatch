@@ -29,4 +29,14 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }} 
         password: ${{ secrets.REGISTRY_PASSWORD }}
         run-quality-checks: 'false'
+  
 
+    - name: Trigger Test run
+      if: github.event.push.ref == 'refs/heads/master'
+      run: |
+       response=$(curl -X POST -H "Authorization: token ${{ github.token }}" https://api.github.com/repos/${{ github.repository }}/dispatches --data '{"event_type": "TriggerContainerScanAssessment", "client_payload": {"commit": "${{ github.event.push.head_commit }}", "repository":  "${{ github.repository }}" }}')
+       if [ "$response" == "" ]; then 
+        echo "Triggering assessment creation succeeded"; 
+       else 
+        echo "Triggering integration tests failed with: '$response'";
+       fi 
