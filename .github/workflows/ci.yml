@@ -1,0 +1,32 @@
+on: [push]
+
+env:
+  REGISTRY_NAME: dsmsacr
+  CLUSTER_NAME: ds-ms-k8s
+  CLUSTER_RESOURCE_GROUP: ds-ms
+  NAMESPACE: default
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    
+    - uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.REGISTRY_NAME }}.azurecr.io
+        username: ${{ secrets.REGISTRY_USERNAME }} 
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+    
+    - run: |
+        docker build . -t ${{ env.REGISTRY_NAME }}.azurecr.io/myimage:${{ github.sha }}
+        docker push ${{ env.REGISTRY_NAME }}.azurecr.io/myimage:${{ github.sha }}
+
+    - uses: azure/container-scan@v0
+      name: Container Scan 
+      with:
+        image-name: ${{ env.REGISTRY_NAME }}.azurecr.io/myimage:${{ github.sha }}
+        username: ${{ secrets.REGISTRY_USERNAME }} 
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+        run-quality-checks: 'false'
+
