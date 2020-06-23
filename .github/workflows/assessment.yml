@@ -6,7 +6,7 @@ name: CI
 # events but only for the master branch
 on:
   repository_dispatch:
-    type: ''    
+    type: 'TriggerContainerScanAssessment'    
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -25,4 +25,3 @@ jobs:
           cluster-name: ds-ms-k8s
           code: Unhealthy
           severity: High
-          commid-id: ${{ github.event.client_payload.commit }}
