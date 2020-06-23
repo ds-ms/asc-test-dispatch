@@ -30,6 +30,9 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }} 
         password: ${{ secrets.REGISTRY_PASSWORD }}
         run-quality-checks: 'false'
+    
+    - run: | 
+        cat $GITHUB_EVENT_PATH
   
 
     - name: Trigger Test run
