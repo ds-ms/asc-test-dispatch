@@ -34,7 +34,7 @@ jobs:
     - name: Trigger Test run
       if: github.ref == 'refs/heads/master'
       run: |
-       response=$(curl -X POST -H "Authorization: token ${{ github.token }}" https://api.github.com/repos/${{ github.repository }}/dispatches --data '{"event_type": "TriggerContainerScanAssessment", "client_payload": {"commit": "${{ github.event.push.head_commit }}", "repository":  "${{ github.repository }}" }}')
+       response=$(curl -X POST -H "Authorization: token ${{ secrets.GIT_PAT_DSMS }}" https://api.github.com/repos/${{ github.repository }}/dispatches --data '{"event_type": "TriggerContainerScanAssessment", "client_payload": {"commit": "${{ github.event.push.head_commit }}", "repository":  "${{ github.repository }}" }}')
        if [ "$response" == "" ]; then 
         echo "Triggering assessment creation succeeded"; 
        else 
