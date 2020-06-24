@@ -1,21 +1,13 @@
-# This is a basic workflow to help you get started with Actions
+name: Dispatch-CI-CreateAssessment
 
-name: CI
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   repository_dispatch:
     type: 'TriggerContainerScanAssessment'    
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - uses: ds-ms/asc-assessment@master
       name: "Create Assessment"
@@ -25,4 +17,4 @@ jobs:
           cluster-name: ds-ms-k8s
           code: Healthy
           severity: High
-          assessment-name: 'GitHub action container scan - Dispatch trigger'
+          assessment-title: 'GitHub action container scan - Dispatch trigger'
