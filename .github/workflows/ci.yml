@@ -31,7 +31,7 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}
         run-quality-checks: 'false'
 
-    - name: Trigger Test run
+    - name: Dispatch assessment trigger
       if: github.ref == 'refs/heads/master'
       run: |
        response=$(curl -X POST -H "Authorization: token ${{ secrets.GIT_PAT_DSMS }}" https://api.github.com/repos/${{ github.repository }}/dispatches --data '{"event_type": "TriggerContainerScanAssessment", "client_payload": {"commit": "${{ github.event.push.head_commit }}", "repository":  "${{ github.repository }}" }}')
@@ -40,3 +40,40 @@ jobs:
        else 
         echo "Triggering integration tests failed with: '$response'";
        fi 
+
+  deploy: 
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - uses: actions/checkout@master
+    - uses: azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_CREDENTIALS }}'
+        cluster-name: ${{ env.CLUSTER_NAME }}
+        resource-group: ${{ env.CLUSTER_RESOURCE_GROUP }}
+    
+    - name: "Create namespace"
+      run: |
+        kubectl create namespace ${{ env.NAMESPACE }} --dry-run -o json | kubectl apply -f -
+    
+    - uses: azure/k8s-create-secret@v1
+      name: "Create secret"
+      with:
+        container-registry-url: ${{ env.REGISTRY_NAME }}.azurecr.io
+        container-registry-username: ${{ secrets.REGISTRY_USERNAME }}
+        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+        secret-name: ${{ env.REGISTRY_NAME }}-registry-connection
+        namespace: ${{ env.NAMESPACE }}
+    
+    - uses: azure/k8s-deploy@v1
+      name: "Deploy to cluster"
+      with:
+        manifests: |
+          manifests/deployment.yml
+          manifests/service.yml
+        images: |
+          ${{ env.REGISTRY_NAME }}.azurecr.io/myimage:${{ github.sha }}
+        imagepullsecrets: |
+          ${{ env.REGISTRY_NAME }}-registry-connection
+        namespace: ${{ env.NAMESPACE }}
