@@ -2,7 +2,7 @@ on: [push]
 
 env:
   REGISTRY_NAME: dsmsacr
-  CLUSTER_NAME: ds-ms-k8s
+  CLUSTER_NAME: ds-ms
   CLUSTER_RESOURCE_GROUP: ds-ms
   NAMESPACE: default
   
