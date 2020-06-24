@@ -25,3 +25,4 @@ jobs:
           cluster-name: ds-ms-k8s
           code: Healthy
           severity: High
+          assessment-name: 'GitHub action container scan - Dispatch trigger'
